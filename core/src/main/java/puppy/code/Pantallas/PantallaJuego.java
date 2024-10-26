@@ -1,4 +1,4 @@
-package puppy.code;
+package puppy.code.Pantallas;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -10,6 +10,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import puppy.code.Entidades.Ball2;
+import puppy.code.Entidades.Bullet;
+import puppy.code.Entidades.Nave4;
 
 public class PantallaJuego implements Screen {
 

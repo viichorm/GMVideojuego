@@ -1,10 +1,12 @@
-package puppy.code;
+package puppy.code.Entidades;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import java.util.Random;
+import puppy.code.Componentes.EntidadMovil;
+import puppy.code.Pantallas.PantallaJuego;
 
 public class Ball2 extends EntidadMovil {
 

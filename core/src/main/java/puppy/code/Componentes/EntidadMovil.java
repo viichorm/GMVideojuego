@@ -1,4 +1,4 @@
-package puppy.code;
+package puppy.code.Componentes;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

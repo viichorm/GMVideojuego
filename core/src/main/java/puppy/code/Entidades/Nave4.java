@@ -1,4 +1,4 @@
-package puppy.code;
+package puppy.code.Entidades;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import puppy.code.Pantallas.PantallaJuego;
 
 public class Nave4 {
 
@@ -20,6 +21,86 @@ public class Nave4 {
     private Sprite spr;
     private Sound sonidoHerido;
     private Sound soundBala;
+
+    public boolean isDestruida() {
+        return destruida;
+    }
+
+    public void setDestruida(boolean destruida) {
+        this.destruida = destruida;
+    }
+
+    public float getxVel() {
+        return xVel;
+    }
+
+    public void setxVel(float xVel) {
+        this.xVel = xVel;
+    }
+
+    public float getyVel() {
+        return yVel;
+    }
+
+    public void setyVel(float yVel) {
+        this.yVel = yVel;
+    }
+
+    public Sprite getSpr() {
+        return spr;
+    }
+
+    public void setSpr(Sprite spr) {
+        this.spr = spr;
+    }
+
+    public Sound getSonidoHerido() {
+        return sonidoHerido;
+    }
+
+    public void setSonidoHerido(Sound sonidoHerido) {
+        this.sonidoHerido = sonidoHerido;
+    }
+
+    public Sound getSoundBala() {
+        return soundBala;
+    }
+
+    public void setSoundBala(Sound soundBala) {
+        this.soundBala = soundBala;
+    }
+
+    public Texture getTxBala() {
+        return txBala;
+    }
+
+    public void setTxBala(Texture txBala) {
+        this.txBala = txBala;
+    }
+
+    public boolean isHerido() {
+        return herido;
+    }
+
+    public void setHerido(boolean herido) {
+        this.herido = herido;
+    }
+
+    public int getTiempoHeridoMax() {
+        return tiempoHeridoMax;
+    }
+
+    public void setTiempoHeridoMax(int tiempoHeridoMax) {
+        this.tiempoHeridoMax = tiempoHeridoMax;
+    }
+
+    public int getTiempoHerido() {
+        return tiempoHerido;
+    }
+
+    public void setTiempoHerido(int tiempoHerido) {
+        this.tiempoHerido = tiempoHerido;
+    }
     private Texture txBala;
     private boolean herido = false;
     private int tiempoHeridoMax = 50;

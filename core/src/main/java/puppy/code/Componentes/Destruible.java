@@ -1,4 +1,4 @@
-package puppy.code;
+package puppy.code.Componentes;
 
 public interface Destruible {
     boolean estaDestruido();
