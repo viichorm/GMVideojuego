@@ -18,6 +18,7 @@ public class PantallaMenu extends PantallaBase {
 
     public PantallaMenu(SpaceNavigation game) {
         super(game);
+        
 
         // Configurar la cámara
         camera = new OrthographicCamera();

@@ -1,37 +1,34 @@
 package puppy.code.utils;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import puppy.code.Componentes.GestorRecursos;
 
-public class SoundUtils {
+public class SoundUtils implements GestorRecursos<Sound> {
 
-    public static Sound loadSound(String path) {
-        return Gdx.audio.newSound(Gdx.files.internal(path));
+    @Override
+    public Sound cargar(String ruta) {
+        return Gdx.audio.newSound(Gdx.files.internal(ruta));
     }
 
-    public static Music loadMusic(String path, boolean loop, float volume) {
-        Music music = Gdx.audio.newMusic(Gdx.files.internal(path));
-        music.setLooping(loop);
-        music.setVolume(volume);
-        return music;
-    }
-
-    public static void playSound(Sound sound) {
-        if (sound != null) {
-            sound.play();
+    @Override
+    public void reproducir(Sound sonido) {
+        if (sonido != null) {
+            sonido.play();
         }
     }
 
-    public static void dispose(Sound sound) {
-        if (sound != null) {
-            sound.dispose();
+    @Override
+    public void detener(Sound sonido) {
+        if (sonido != null) {
+            sonido.stop();
         }
     }
 
-    public static void dispose(Music music) {
-        if (music != null) {
-            music.dispose();
+    @Override
+    public void liberar(Sound sonido) {
+        if (sonido != null) {
+            sonido.dispose();
         }
     }
 }

@@ -3,12 +3,15 @@ package puppy.code.Pantallas;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.audio.Music;
 import puppy.code.Componentes.PantallaBase;
 import puppy.code.utils.SoundUtils;
+import puppy.code.utils.MusicUtils;
 
 public class PantallaGameOver extends PantallaBase {
-    private Sound gameOverSound;
+    private Music gameOverSound;
+    private MusicUtils gestorMusica;  // Instancia de MusicManager    private GestorRecursos<Music> gestorSonido;
+    
     private float elapsedTime;
     private float restartCounter;  // Contador de tiempo hasta que se permita reiniciar
     private boolean showText;
@@ -17,14 +20,19 @@ public class PantallaGameOver extends PantallaBase {
 
     public PantallaGameOver(SpaceNavigation game) {
         super(game);
-        // Cargar el sonido de Game Over
-        gameOverSound = SoundUtils.loadSound("game-over.mp3");
-        SoundUtils.playSound(gameOverSound);
+        
+        // Crear una instancia de MusicManager
+        gestorMusica = new MusicUtils();
+        
+        // Cargar y reproducir el sonido de Game Over como música
+        gameOverSound = gestorMusica.cargar("game-over.mp3");
+        gameOverSound.setLooping(false);
+        gestorMusica.reproducir(gameOverSound);
         
         // Inicializar variables
         elapsedTime = 0;
-        restartCounter = 0;  // Inicializa el contador de reinicio
-        canRestart = false;  // Inicialmente no se puede reiniciar
+        restartCounter = 0;
+        canRestart = false;
     }
 
     @Override
@@ -71,6 +79,15 @@ public class PantallaGameOver extends PantallaBase {
             game.setScreen(nuevaPantallaJuego);
             dispose();
         }
+    }
+
+    @Override
+    public void dispose() {
+        // Liberar el sonido de Game Over al cambiar de pantalla
+        if (gameOverSound != null) {
+            gameOverSound.dispose();
+        }
+        super.dispose();
     }
 
     @Override

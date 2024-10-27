@@ -11,7 +11,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import puppy.code.Entidades.Ball2;
 import puppy.code.Entidades.Bullet;
 import puppy.code.Entidades.Nave4;
-import puppy.code.utils.SoundUtils; // Importar SoundUtils
+import puppy.code.utils.SoundUtils;  // Gestor de sonidos
+import puppy.code.utils.MusicUtils;  // Gestor de música
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 
@@ -23,6 +24,8 @@ public class PantallaJuego implements Screen {
     private Sound explosionSound;
     private Music gameMusic;
     private Sound deadSound;
+    private SoundUtils soundManager;  // Instancia de SoundManager
+    private MusicUtils musicManager;  // Instancia de MusicManager
 
     private int score;
     private int ronda;
@@ -48,26 +51,30 @@ public class PantallaJuego implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 640);
 
-        // Cargar sonidos usando SoundUtils
-        explosionSound = SoundUtils.loadSound("explosion.ogg");
-        deadSound = SoundUtils.loadSound("dead.wav");
-        gameMusic = SoundUtils.loadMusic("piano-loops.wav", true, 0.5f);
+        soundManager = new SoundUtils();   // Inicializar SoundManager
+        musicManager = new MusicUtils();   // Inicializar MusicManager
 
+        // Cargar sonidos usando SoundManager y MusicManager
+        explosionSound = soundManager.cargar("explosion.ogg");
+        deadSound = soundManager.cargar("dead.wav");
+        gameMusic = musicManager.cargar("piano-loops.wav");
+        gameMusic.setLooping(true);
+        gameMusic.setVolume(0.5f);
         gameMusic.play();
 
         // Crear la nave
         nave = new Nave4(Gdx.graphics.getWidth() / 2 - 50, 30,
                          new Texture(Gdx.files.internal("MainShip3.png")),
-                         SoundUtils.loadSound("hurt.ogg"),
+                         soundManager.cargar("hurt.ogg"),
                          new Texture(Gdx.files.internal("Rocket2.png")),
-                         SoundUtils.loadSound("pop-sound.mp3"));
+                         soundManager.cargar("pop-sound.mp3"));
         nave.setVidas(vidas);
 
         // Crear asteroides
         Random r = new Random();
         for (int i = 0; i < cantAsteroides; i++) {
             boolean isExplosive = r.nextBoolean();
-            int fragmentCount = isExplosive ? 3 : 0; // Solo asteroides explosivos generan fragmentos
+            int fragmentCount = isExplosive ? 3 : 0;
             Ball2 bb = new Ball2(r.nextInt(Gdx.graphics.getWidth()),
                     50 + r.nextInt(Gdx.graphics.getHeight() - 50),
                     20 + r.nextInt(10),
@@ -116,7 +123,7 @@ public class PantallaJuego implements Screen {
             b.update();
             for (int j = 0; j < balls1.size(); j++) {
                 if (b.checkCollision(balls1.get(j))) {
-                    SoundUtils.playSound(explosionSound); // Usar SoundUtils para reproducir sonido
+                    soundManager.reproducir(explosionSound);  // Usar SoundManager para reproducir
                     balls1.get(j).explode();
                     balls1.remove(j);
                     j--;
@@ -170,8 +177,8 @@ public class PantallaJuego implements Screen {
 
     private void verificarGameOver() {
         if (nave.estaDestruido()) {
-            SoundUtils.playSound(deadSound); // Reproducir sonido de muerte usando SoundUtils
-            nave.desintegrar(); // Efecto de desintegración
+            soundManager.reproducir(deadSound);  // Reproducir sonido de muerte
+            nave.desintegrar();
 
             if (score > game.getHighScore()) {
                 game.setHighScore(score);
@@ -183,7 +190,7 @@ public class PantallaJuego implements Screen {
 
     private void verificarAvanceNivel() {
         if (balls1.isEmpty()) {
-            nave.incrementarVida(); // Aumentar vida al avanzar de nivel
+            nave.incrementarVida();
             game.setScreen(new PantallaJuego(game, ronda + 1, nave.getVidas(), score,
                     velXAsteroides + 3, velYAsteroides + 3, cantAsteroides + 10));
             dispose();
@@ -218,8 +225,8 @@ public class PantallaJuego implements Screen {
 
     @Override
     public void dispose() {
-        SoundUtils.dispose(explosionSound); // Usar SoundUtils para liberar recursos
-        SoundUtils.dispose(deadSound);
-        SoundUtils.dispose(gameMusic);
+        soundManager.liberar(explosionSound);
+        soundManager.liberar(deadSound);
+        musicManager.liberar(gameMusic);  // Liberar música correctamente
     }
 }

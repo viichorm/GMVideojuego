@@ -1,72 +1,78 @@
 package puppy.code.Pantallas;
 
 import puppy.code.Componentes.PantallaBase;
-import puppy.code.utils.SoundUtils;  // Importar la clase SoundUtils
+import puppy.code.utils.SoundUtils;
+import puppy.code.utils.MusicUtils;  // Importar la clase MusicUtils
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.ScreenUtils;
+import puppy.code.Componentes.GestorRecursos;
 
 public class PantallaOpciones extends PantallaBase {
-
+    
+    private GestorRecursos<Sound> soundGestor;
+    private GestorRecursos<Music> musicGestor;  // Cambiar a GestorRecursos<Music> para manejar música
+    
     private String[] opciones = {"Color Fondo: Azul", "Volver"};
     private int selectedIndex = 0;
-    private float[] fondoColor = {0, 0, 0.2f};  // Color inicial del fondo (azul oscuro)
+    private float[] fondoColor = {0, 0, 0.2f};
 
-    private Sound optionMoveSound;  // Sonido para moverse entre opciones y seleccionar
-    private Music backgroundMusic;  // Música de fondo
-    private float[] colorActual;  // Almacena el color actual del fondo
+    private Sound optionMoveSound;
+    private Music backgroundMusic;
+    private float[] colorActual;
 
     public PantallaOpciones(SpaceNavigation game) {
         super(game);
+        soundGestor = new SoundUtils();
+        musicGestor = new MusicUtils();  // Usar MusicUtils para la música
 
         // Cargar los sonidos
-        optionMoveSound = SoundUtils.loadSound("opcion-menu.wav");  // Sonido para moverse/seleccionar
-        backgroundMusic = SoundUtils.loadMusic("menu-song.wav", true, 0.5f);  // Música de fondo, en bucle, con volumen ajustado
+        optionMoveSound = soundGestor.cargar("opcion-menu.wav");
+        backgroundMusic = musicGestor.cargar("ObservingTheStar.ogg");  // Usar musicGestor para cargar la música
+        backgroundMusic.setLooping(true);  // Activar bucle en la música de fondo
+        backgroundMusic.setVolume(0.5f);  // Ajustar volumen de la música
     }
 
     @Override
     public void show() {
         // Reproducir la música de fondo al mostrar la pantalla de opciones
-        backgroundMusic.play();
+        musicGestor.reproducir(backgroundMusic);
     }
 
     @Override
     public void render(float delta) {
-        // Establecer el color del fondo dinámicamente
         ScreenUtils.clear(fondoColor[0], fondoColor[1], fondoColor[2], 1);
 
         super.render(delta);
 
         batch.begin();
-        // Dibujar las opciones del menú de opciones
         for (int i = 0; i < opciones.length; i++) {
             if (i == selectedIndex) {
-                font.getData().setScale(2.5f);  // Resaltar opción seleccionada
+                font.getData().setScale(2.5f);
                 font.draw(batch, "> " + opciones[i], 540, 500 - i * 60);
-                font.getData().setScale(2f);  // Restaurar tamaño
+                font.getData().setScale(2f);
             } else {
                 font.draw(batch, opciones[i], 550, 500 - i * 60);
             }
         }
         batch.end();
 
-        manejarInput();  // Manejar entrada de usuario
+        manejarInput();
     }
 
-    @Override
-protected void manejarInput() {
+    protected void manejarInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
             selectedIndex = (selectedIndex + 1) % opciones.length;
-            SoundUtils.playSound(optionMoveSound);
+            soundGestor.reproducir(optionMoveSound);
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             selectedIndex = (selectedIndex - 1 + opciones.length) % opciones.length;
-            SoundUtils.playSound(optionMoveSound);
+            soundGestor.reproducir(optionMoveSound);
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            SoundUtils.playSound(optionMoveSound);
+            soundGestor.reproducir(optionMoveSound);
             switch (selectedIndex) {
                 case 0:
                     cambiarColorFondo();
@@ -79,70 +85,48 @@ protected void manejarInput() {
         }
     }
 
+    private int colorIndex = 0;
+    private float[][] colores = {
+        {0, 0, 0.2f},
+        {0.5f, 0.1f, 0.6f},
+        {0, 0.5f, 0.2f},
+        {0.2f, 0.2f, 0.5f}
+    };
 
-    private int colorIndex = 0;  // Índice del color actual
-private float[][] colores = {  // Lista de colores
-    {0, 0, 0.2f},   // Azul oscuro
-    {0.5f, 0.1f, 0.6f},  // Morado
-    {0, 0.5f, 0.2f},   // Verde oscuro
-    {0.2f, 0.2f, 0.5f}   // Gris azulado
-};
+    private void cambiarColorFondo() {
+        colorIndex = (colorIndex + 1) % colores.length;
+        PantallaBase.setFondoColor(colores[colorIndex]);
+        actualizarTextoColor();
+    }
 
-private void sincronizarColorConFondo() {
-        // Sincroniza el colorIndex con el color actual en fondoColor
-        for (int i = 0; i < colores.length; i++) {
-            if (colores[i][0] == fondoColor[0] && colores[i][1] == fondoColor[1] && colores[i][2] == fondoColor[2]) {
-                colorIndex = i;
-                break;
-            }
+    private void actualizarTextoColor() {
+        String nombreColor;
+        switch (colorIndex) {
+            case 0: nombreColor = "Azul Oscuro"; break;
+            case 1: nombreColor = "Morado"; break;
+            case 2: nombreColor = "Verde Oscuro"; break;
+            case 3: nombreColor = "Gris Azulado"; break;
+            default: nombreColor = "Desconocido"; break;
         }
+        opciones[0] = "Color Fondo: " + nombreColor;
     }
-// Cambia el color de fondo al siguiente en la lista
-private void cambiarColorFondo() {
-    colorIndex = (colorIndex + 1) % colores.length;  // Avanza al siguiente color en la lista
-    PantallaBase.setFondoColor(colores[colorIndex]);  // Actualiza el color de fondo globalmente
-    actualizarTextoColor();  // Actualiza el texto de la opción en el menú
-}
-
-
-// Actualiza el texto de la opción en función del color actual
-private void actualizarTextoColor() {
-    String nombreColor;
-    switch (colorIndex) {
-        case 0: nombreColor = "Azul Oscuro"; break;
-        case 1: nombreColor = "Morado"; break;
-        case 2: nombreColor = "Verde Oscuro"; break;
-        case 3: nombreColor = "Gris Azulado"; break;
-        default: nombreColor = "Desconocido"; break;
-    }
-    opciones[0] = "Color Fondo: " + nombreColor;
-}
-
 
     @Override
     public void dispose() {
         super.dispose();
-        // Liberar recursos de los sonidos y la música
-        SoundUtils.dispose(optionMoveSound);
-        SoundUtils.dispose(backgroundMusic);
+        soundGestor.liberar(optionMoveSound);
+        musicGestor.liberar(backgroundMusic);  // Liberar recursos de la música de fondo
     }
 
     @Override
-    public void resize(int width, int height) {
-            }
+    public void resize(int width, int height) {}
 
     @Override
-    public void pause() {
-        
-    }
+    public void pause() {}
 
     @Override
-    public void resume() {
-        
-    }
+    public void resume() {}
 
     @Override
-    public void hide() {
-        
-    }
+    public void hide() {}
 }
