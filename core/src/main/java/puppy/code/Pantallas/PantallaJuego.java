@@ -3,29 +3,24 @@ package puppy.code.Pantallas;
 import java.util.ArrayList;
 import java.util.Random;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import puppy.code.Entidades.Ball2;
 import puppy.code.Entidades.Bullet;
 import puppy.code.Entidades.Nave4;
-import puppy.code.utils.SoundUtils;  // Gestor de sonidos
-import puppy.code.utils.MusicUtils;  // Gestor de música
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
+import puppy.code.Componentes.PantallaBase;
+import puppy.code.utils.SoundUtils;
+import puppy.code.utils.MusicUtils;
 
-public class PantallaJuego implements Screen {
+public class PantallaJuego extends PantallaBase {
 
-    private SpaceNavigation game;
-    private OrthographicCamera camera;
-    private SpriteBatch batch;
     private Sound explosionSound;
     private Music gameMusic;
     private Sound deadSound;
-    private SoundUtils soundManager;  // Instancia de SoundManager
-    private MusicUtils musicManager;  // Instancia de MusicManager
+    private SoundUtils soundManager;
+    private MusicUtils musicManager;
 
     private int score;
     private int ronda;
@@ -40,26 +35,25 @@ public class PantallaJuego implements Screen {
 
     public PantallaJuego(SpaceNavigation game, int ronda, int vidas, int score,
                          int velXAsteroides, int velYAsteroides, int cantAsteroides) {
-        this.game = game;
+        super(game);  // Llamada al constructor de PantallaBase
+
         this.ronda = ronda;
         this.score = score;
         this.velXAsteroides = velXAsteroides;
         this.velYAsteroides = velYAsteroides;
         this.cantAsteroides = cantAsteroides;
 
-        batch = game.getBatch();
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 640);
+        soundManager = new SoundUtils();
+        musicManager = new MusicUtils();
 
-        soundManager = new SoundUtils();   // Inicializar SoundManager
-        musicManager = new MusicUtils();   // Inicializar MusicManager
-
-        // Cargar sonidos usando SoundManager y MusicManager
+        // Cargar sonidos y música con los gestores
         explosionSound = soundManager.cargar("explosion.ogg");
         deadSound = soundManager.cargar("dead.wav");
         gameMusic = musicManager.cargar("piano-loops.wav");
         gameMusic.setLooping(true);
-        gameMusic.setVolume(0.5f);
+
+        // Usar el volumen global de PantallaBase
+        gameMusic.setVolume(getVolumenGlobal());
         gameMusic.play();
 
         // Crear la nave
@@ -85,22 +79,17 @@ public class PantallaJuego implements Screen {
             balls1.add(bb);
         }
     }
-
+    
+    // Método público para agregar fragmentos
     public void agregarFragmento(Ball2 fragment) {
         fragmentos.add(fragment);
     }
 
-    public void dibujaEncabezado() {
-        CharSequence str = "Vidas: " + nave.getVidas() + " Ronda: " + ronda;
-        game.getFont().getData().setScale(2f);
-        game.getFont().draw(batch, str, 10, 30);
-        game.getFont().draw(batch, "Score:" + this.score, Gdx.graphics.getWidth() - 150, 30);
-        game.getFont().draw(batch, "HighScore:" + game.getHighScore(), Gdx.graphics.getWidth() / 2 - 100, 30);
-    }
-
     @Override
     public void render(float delta) {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        // Usar el color de fondo de PantallaBase
+        super.render(delta);
+
         batch.begin();
         dibujaEncabezado();
 
@@ -121,15 +110,18 @@ public class PantallaJuego implements Screen {
         for (int i = 0; i < balas.size(); i++) {
             Bullet b = balas.get(i);
             b.update();
+            b.draw(batch);
+
             for (int j = 0; j < balls1.size(); j++) {
                 if (b.checkCollision(balls1.get(j))) {
-                    soundManager.reproducir(explosionSound);  // Usar SoundManager para reproducir
+                    soundManager.reproducir(explosionSound);
                     balls1.get(j).explode();
                     balls1.remove(j);
                     j--;
                     score += 10;
                 }
             }
+
             if (b.estaDestruido()) {
                 balas.remove(i);
                 i--;
@@ -177,7 +169,7 @@ public class PantallaJuego implements Screen {
 
     private void verificarGameOver() {
         if (nave.estaDestruido()) {
-            soundManager.reproducir(deadSound);  // Reproducir sonido de muerte
+            soundManager.reproducir(deadSound);
             nave.desintegrar();
 
             if (score > game.getHighScore()) {
@@ -201,9 +193,31 @@ public class PantallaJuego implements Screen {
         return ball.getSprite().getX() < 0 || ball.getSprite().getX() > Gdx.graphics.getWidth()
                 || ball.getSprite().getY() < 0 || ball.getSprite().getY() > Gdx.graphics.getHeight();
     }
+    
+    public void dibujaEncabezado() {
+    CharSequence str = "Vidas: " + nave.getVidas() + " Ronda: " + ronda;
+    game.getFont().getData().setScale(2f);
+    game.getFont().draw(batch, str, 10, 30);
+    game.getFont().draw(batch, "Score:" + this.score, Gdx.graphics.getWidth() - 150, 30);
+    game.getFont().draw(batch, "HighScore:" + game.getHighScore(), Gdx.graphics.getWidth() / 2 - 100, 30);
+}
+
 
     public boolean agregarBala(Bullet bb) {
         return balas.add(bb);
+    }
+
+    @Override
+    protected void manejarInput() {
+        // No se necesita manejo de input en PantallaJuego
+    }
+
+    @Override
+    public void dispose() {
+        soundManager.liberar(explosionSound);
+        soundManager.liberar(deadSound);
+        musicManager.liberar(gameMusic);
+        super.dispose();
     }
 
     @Override
@@ -212,21 +226,12 @@ public class PantallaJuego implements Screen {
     }
 
     @Override
-    public void resize(int width, int height) {}
-
-    @Override
     public void pause() {}
 
     @Override
     public void resume() {}
 
     @Override
-    public void hide() {}
-
-    @Override
-    public void dispose() {
-        soundManager.liberar(explosionSound);
-        soundManager.liberar(deadSound);
-        musicManager.liberar(gameMusic);  // Liberar música correctamente
+    public void hide() {
     }
 }

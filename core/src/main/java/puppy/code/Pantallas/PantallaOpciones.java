@@ -11,11 +11,13 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import puppy.code.Componentes.GestorRecursos;
 
 public class PantallaOpciones extends PantallaBase {
+    // Opciones del menú, incluyendo la nueva opción de volumen
+    private String[] opciones = {"Color Fondo: Azul", "Volumen: 50%", "Volver"};
+    private float volumen = 0.5f;  // Volumen inicial al 50%
     
     private GestorRecursos<Sound> soundGestor;
     private GestorRecursos<Music> musicGestor;  // Cambiar a GestorRecursos<Music> para manejar música
     
-    private String[] opciones = {"Color Fondo: Azul", "Volver"};
     private int selectedIndex = 0;
     private float[] fondoColor = {0, 0, 0.2f};
 
@@ -26,13 +28,13 @@ public class PantallaOpciones extends PantallaBase {
     public PantallaOpciones(SpaceNavigation game) {
         super(game);
         soundGestor = new SoundUtils();
-        musicGestor = new MusicUtils();  // Usar MusicUtils para la música
+        musicGestor = new MusicUtils();
 
-        // Cargar los sonidos
         optionMoveSound = soundGestor.cargar("opcion-menu.wav");
-        backgroundMusic = musicGestor.cargar("ObservingTheStar.ogg");  // Usar musicGestor para cargar la música
-        backgroundMusic.setLooping(true);  // Activar bucle en la música de fondo
-        backgroundMusic.setVolume(0.5f);  // Ajustar volumen de la música
+        backgroundMusic = musicGestor.cargar("ObservingTheStar.ogg");
+        backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(volumen);
+        musicGestor.reproducir(backgroundMusic);
     }
 
     @Override
@@ -78,6 +80,9 @@ public class PantallaOpciones extends PantallaBase {
                     cambiarColorFondo();
                     break;
                 case 1:
+                    ajustarVolumen();  // Ajustar el volumen cuando se selecciona la opción
+                    break;
+                case 2:
                     game.setScreen(new PantallaMenu(game));
                     dispose();
                     break;
@@ -111,12 +116,22 @@ public class PantallaOpciones extends PantallaBase {
         opciones[0] = "Color Fondo: " + nombreColor;
     }
 
+    private void ajustarVolumen() {
+        volumen += 0.1f;
+        if (volumen > 1f) volumen = 0f;
+
+        setVolumenGlobal(volumen);  // Actualizar el volumen global
+        backgroundMusic.setVolume(volumen);  // Aplicar el volumen a la música actual
+        opciones[1] = "Volumen: " + (int)(volumen * 100) + "%";  // Actualizar el texto
+    }
+
     @Override
     public void dispose() {
         super.dispose();
         soundGestor.liberar(optionMoveSound);
-        musicGestor.liberar(backgroundMusic);  // Liberar recursos de la música de fondo
+        musicGestor.liberar(backgroundMusic);
     }
+
 
     @Override
     public void resize(int width, int height) {}

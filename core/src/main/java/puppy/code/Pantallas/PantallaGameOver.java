@@ -21,15 +21,17 @@ public class PantallaGameOver extends PantallaBase {
     public PantallaGameOver(SpaceNavigation game) {
         super(game);
         
-        // Crear una instancia de MusicManager
         gestorMusica = new MusicUtils();
         
-        // Cargar y reproducir el sonido de Game Over como música
+        // Cargar y reproducir el sonido de Game Over
         gameOverSound = gestorMusica.cargar("game-over.mp3");
         gameOverSound.setLooping(false);
+
+        // Configurar el volumen de acuerdo con el volumen global
+        gameOverSound.setVolume(PantallaBase.getVolumenGlobal());
+
         gestorMusica.reproducir(gameOverSound);
         
-        // Inicializar variables
         elapsedTime = 0;
         restartCounter = 0;
         canRestart = false;

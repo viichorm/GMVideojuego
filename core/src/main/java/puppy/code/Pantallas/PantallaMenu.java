@@ -19,14 +19,12 @@ public class PantallaMenu extends PantallaBase {
     public PantallaMenu(SpaceNavigation game) {
         super(game);
         
-
-        // Configurar la cámara
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1200, 800);
 
-        // Cargar la música del menú y sonidos
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal("menu-song.wav"));
         menuMusic.setLooping(true);
+        menuMusic.setVolume(getVolumenGlobal());  // Aplicar el volumen global
 
         menuOptionSound = Gdx.audio.newSound(Gdx.files.internal("opcion-menu.wav"));
     }

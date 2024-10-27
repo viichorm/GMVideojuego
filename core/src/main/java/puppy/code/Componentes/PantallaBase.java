@@ -15,22 +15,32 @@ public abstract class PantallaBase implements Screen {
     protected OrthographicCamera camera;
     protected SpriteBatch batch;
     protected BitmapFont font;
+    // Volumen global para la música, inicializado al 50%
+    protected static float volumenGlobal = 0.5f;
     
     // Color de fondo compartido entre todas las pantallas
     protected static float[] fondoColor = {0, 0, 0.2f};  // Azul oscuro por defecto
 
+    // Método para establecer el volumen global
+    public static void setVolumenGlobal(float nuevoVolumen) {
+        volumenGlobal = Math.max(0, Math.min(nuevoVolumen, 1));  // Limitar entre 0 y 1
+    }
+
+    // Método para obtener el volumen global
+    public static float getVolumenGlobal() {
+        return volumenGlobal;
+    }
+    
     // Constructor
     public PantallaBase(SpaceNavigation game) {
         this.game = game;
-        
-        // Configurar la cámara
+
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1200, 800);
-        
-        // Inicializar el batch y la fuente
+
         batch = new SpriteBatch();
-        font = new BitmapFont();  // Usa la fuente predeterminada
-        font.getData().setScale(2f);  // Aumentar el tamaño de la fuente
+        font = new BitmapFont();
+        font.getData().setScale(2f);
     }
 
     @Override
