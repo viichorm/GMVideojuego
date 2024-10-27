@@ -14,12 +14,10 @@ public abstract class EntidadMovil {
         this.ySpeed = ySpeed;
     }
 
-    // Métodos abstractos para que cada clase los implemente
     public abstract void update();
     public abstract void draw(SpriteBatch batch);
     public abstract boolean checkCollision(EntidadMovil other);
 
-    // Métodos comunes que todas las entidades usarán
     public Rectangle getArea() {
         return spr.getBoundingRectangle();
     }

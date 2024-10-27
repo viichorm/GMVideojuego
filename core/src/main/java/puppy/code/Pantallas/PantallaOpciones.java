@@ -16,6 +16,7 @@ public class PantallaOpciones extends PantallaBase {
 
     private Sound optionMoveSound;  // Sonido para moverse entre opciones y seleccionar
     private Music backgroundMusic;  // Música de fondo
+    private float[] colorActual;  // Almacena el color actual del fondo
 
     public PantallaOpciones(SpaceNavigation game) {
         super(game);
@@ -56,35 +57,27 @@ public class PantallaOpciones extends PantallaBase {
 
     @Override
 protected void manejarInput() {
-    // Navegar por las opciones del menú
-    if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-        selectedIndex++;
-        if (selectedIndex >= opciones.length) {
-            selectedIndex = 0;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+            selectedIndex = (selectedIndex + 1) % opciones.length;
+            SoundUtils.playSound(optionMoveSound);
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+            selectedIndex = (selectedIndex - 1 + opciones.length) % opciones.length;
+            SoundUtils.playSound(optionMoveSound);
         }
-        SoundUtils.playSound(optionMoveSound);  // Reproducir sonido al moverse
-    } else if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-        selectedIndex--;
-        if (selectedIndex < 0) {
-            selectedIndex = opciones.length - 1;
-        }
-        SoundUtils.playSound(optionMoveSound);  // Reproducir sonido al moverse
-    }
 
-    // Seleccionar la opción con Enter
-    if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-        SoundUtils.playSound(optionMoveSound);  // Reproducir sonido de selección (mismo sonido)
-        switch (selectedIndex) {
-            case 0:
-                cambiarColorFondo();  // Cambiar color de fondo y actualizar texto
-                break;
-            case 1:
-                game.setScreen(new PantallaMenu(game));  // Volver al menú
-                dispose();
-                break;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            SoundUtils.playSound(optionMoveSound);
+            switch (selectedIndex) {
+                case 0:
+                    cambiarColorFondo();
+                    break;
+                case 1:
+                    game.setScreen(new PantallaMenu(game));
+                    dispose();
+                    break;
+            }
         }
     }
-}
 
 
     private int colorIndex = 0;  // Índice del color actual
@@ -95,6 +88,15 @@ private float[][] colores = {  // Lista de colores
     {0.2f, 0.2f, 0.5f}   // Gris azulado
 };
 
+private void sincronizarColorConFondo() {
+        // Sincroniza el colorIndex con el color actual en fondoColor
+        for (int i = 0; i < colores.length; i++) {
+            if (colores[i][0] == fondoColor[0] && colores[i][1] == fondoColor[1] && colores[i][2] == fondoColor[2]) {
+                colorIndex = i;
+                break;
+            }
+        }
+    }
 // Cambia el color de fondo al siguiente en la lista
 private void cambiarColorFondo() {
     colorIndex = (colorIndex + 1) % colores.length;  // Avanza al siguiente color en la lista

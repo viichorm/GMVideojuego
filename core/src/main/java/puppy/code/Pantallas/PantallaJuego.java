@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,6 +11,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import puppy.code.Entidades.Ball2;
 import puppy.code.Entidades.Bullet;
 import puppy.code.Entidades.Nave4;
+import puppy.code.utils.SoundUtils; // Importar SoundUtils
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 
 public class PantallaJuego implements Screen {
 
@@ -21,6 +22,8 @@ public class PantallaJuego implements Screen {
     private SpriteBatch batch;
     private Sound explosionSound;
     private Music gameMusic;
+    private Sound deadSound;
+
     private int score;
     private int ronda;
     private int velXAsteroides;
@@ -33,7 +36,7 @@ public class PantallaJuego implements Screen {
     private ArrayList<Bullet> balas = new ArrayList<>();
 
     public PantallaJuego(SpaceNavigation game, int ronda, int vidas, int score,
-            int velXAsteroides, int velYAsteroides, int cantAsteroides) {
+                         int velXAsteroides, int velYAsteroides, int cantAsteroides) {
         this.game = game;
         this.ronda = ronda;
         this.score = score;
@@ -45,16 +48,19 @@ public class PantallaJuego implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 640);
 
-        explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.ogg"));
-        gameMusic = Gdx.audio.newMusic(Gdx.files.internal("piano-loops.wav"));
-        gameMusic.setLooping(true);
-        gameMusic.setVolume(0.5f);
+        // Cargar sonidos usando SoundUtils
+        explosionSound = SoundUtils.loadSound("explosion.ogg");
+        deadSound = SoundUtils.loadSound("dead.wav");
+        gameMusic = SoundUtils.loadMusic("piano-loops.wav", true, 0.5f);
+
         gameMusic.play();
 
-        nave = new Nave4(Gdx.graphics.getWidth() / 2 - 50, 30, new Texture(Gdx.files.internal("MainShip3.png")),
-                         Gdx.audio.newSound(Gdx.files.internal("hurt.ogg")),
+        // Crear la nave
+        nave = new Nave4(Gdx.graphics.getWidth() / 2 - 50, 30,
+                         new Texture(Gdx.files.internal("MainShip3.png")),
+                         SoundUtils.loadSound("hurt.ogg"),
                          new Texture(Gdx.files.internal("Rocket2.png")),
-                         Gdx.audio.newSound(Gdx.files.internal("pop-sound.mp3")));
+                         SoundUtils.loadSound("pop-sound.mp3"));
         nave.setVidas(vidas);
 
         // Crear asteroides
@@ -68,17 +74,15 @@ public class PantallaJuego implements Screen {
                     velXAsteroides + r.nextInt(4),
                     velYAsteroides + r.nextInt(4),
                     new Texture(Gdx.files.internal("aGreyMedium4.png")),
-                    isExplosive, fragmentCount, this); // Pasar 'this' como referencia a PantallaJuego
+                    isExplosive, fragmentCount, this);
             balls1.add(bb);
         }
     }
 
-    // Método para agregar fragmentos a la lista
     public void agregarFragmento(Ball2 fragment) {
         fragmentos.add(fragment);
     }
 
-    // Dibujar encabezado
     public void dibujaEncabezado() {
         CharSequence str = "Vidas: " + nave.getVidas() + " Ronda: " + ronda;
         game.getFont().getData().setScale(2f);
@@ -94,112 +98,98 @@ public class PantallaJuego implements Screen {
         dibujaEncabezado();
 
         if (!nave.estaHerido()) {
-            // Actualizar balas y verificar colisiones
-            for (int i = 0; i < balas.size(); i++) {
-                Bullet b = balas.get(i);
-                b.update();
-                for (int j = 0; j < balls1.size(); j++) {
-                    if (b.checkCollision(balls1.get(j))) {
-                        explosionSound.play();
-                        balls1.get(j).explode();
-                        balls1.remove(j);
-                        j--;
-                        score += 10;
-                    }
-                }
-                if (b.estaDestruido()) {
-                    balas.remove(i);
-                    i--;
-                }
-            }
-
-            // Actualizar y dibujar asteroides
-            for (Ball2 ball : balls1) {
-                ball.update();
-                ball.draw(batch);
-            }
-
-            // Actualizar y dibujar fragmentos
-            for (int i = 0; i < fragmentos.size(); i++) {
-                Ball2 fragment = fragmentos.get(i);
-                fragment.update();
-                if (fueraDePantalla(fragment)) {
-                    fragmentos.remove(i);
-                    i--;
-                } else {
-                    fragment.draw(batch);
-                }
-            }
-
-            // Verificar colisiones entre asteroides
-            for (int i = 0; i < balls1.size(); i++) {
-                Ball2 ball1 = balls1.get(i);
-                for (int j = i + 1; j < balls1.size(); j++) {
-                    ball1.checkCollision(balls1.get(j));
-                }
-                for (int j = 0; j < fragmentos.size(); j++) {
-                    ball1.checkCollision(fragmentos.get(j));
-                }
-            }
-
-            // Verificar colisiones entre fragmentos
-            for (int i = 0; i < fragmentos.size(); i++) {
-                Ball2 frag1 = fragmentos.get(i);
-                for (int j = i + 1; j < fragmentos.size(); j++) {
-                    frag1.checkCollision(fragmentos.get(j));
-                }
-            }
+            actualizarBalas();
+            actualizarAsteroidesYFragmentos();
+            verificarColisionesNave();
         }
 
-        // Dibujar balas
-        for (Bullet b : balas) {
-            b.draw(batch);
-        }
-
-        // Dibujar nave
         nave.draw(batch, this);
+        batch.end();
 
-        // Verificar colisiones entre la nave y los asteroides
+        verificarGameOver();
+        verificarAvanceNivel();
+    }
+
+    private void actualizarBalas() {
+        for (int i = 0; i < balas.size(); i++) {
+            Bullet b = balas.get(i);
+            b.update();
+            for (int j = 0; j < balls1.size(); j++) {
+                if (b.checkCollision(balls1.get(j))) {
+                    SoundUtils.playSound(explosionSound); // Usar SoundUtils para reproducir sonido
+                    balls1.get(j).explode();
+                    balls1.remove(j);
+                    j--;
+                    score += 10;
+                }
+            }
+            if (b.estaDestruido()) {
+                balas.remove(i);
+                i--;
+            }
+        }
+    }
+
+    private void actualizarAsteroidesYFragmentos() {
+        for (Ball2 ball : balls1) {
+            ball.update();
+            ball.draw(batch);
+        }
+
+        for (int i = 0; i < fragmentos.size(); i++) {
+            Ball2 fragment = fragmentos.get(i);
+            fragment.update();
+            if (fueraDePantalla(fragment)) {
+                fragmentos.remove(i);
+                i--;
+            } else {
+                fragment.draw(batch);
+            }
+        }
+    }
+
+    private void verificarColisionesNave() {
         for (int i = 0; i < balls1.size(); i++) {
             Ball2 b = balls1.get(i);
             if (nave.checkCollision(b)) {
                 balls1.remove(i);
                 i--;
+                nave.reducirVida();
             }
         }
 
-        // Verificar colisiones entre la nave y los fragmentos
         for (int i = 0; i < fragmentos.size(); i++) {
             Ball2 frag = fragmentos.get(i);
             if (nave.checkCollision(frag)) {
                 fragmentos.remove(i);
                 i--;
+                nave.reducirVida();
             }
         }
+    }
 
-        // Si la nave es destruida, mostrar pantalla de Game Over
+    private void verificarGameOver() {
         if (nave.estaDestruido()) {
-            if (score > game.getHighScore())
+            SoundUtils.playSound(deadSound); // Reproducir sonido de muerte usando SoundUtils
+            nave.desintegrar(); // Efecto de desintegración
+
+            if (score > game.getHighScore()) {
                 game.setHighScore(score);
-            Screen ss = new PantallaGameOver(game);
-            ss.resize(1200, 800);
-            game.setScreen(ss);
-            dispose();
-        }
-
-        batch.end();
-
-        // Si no quedan asteroides ni fragmentos, avanzar de nivel
-        if (balls1.isEmpty() && fragmentos.isEmpty()) {
-            Screen ss = new PantallaJuego(game, ronda + 1, nave.getVidas(), score,
-                    velXAsteroides + 3, velYAsteroides + 3, cantAsteroides + 10);
-            ss.resize(1200, 800);
-            game.setScreen(ss);
+            }
+            game.setScreen(new PantallaGameOver(game));
             dispose();
         }
     }
 
-    // Método para verificar si un fragmento está fuera de la pantalla
+    private void verificarAvanceNivel() {
+        if (balls1.isEmpty()) {
+            nave.incrementarVida(); // Aumentar vida al avanzar de nivel
+            game.setScreen(new PantallaJuego(game, ronda + 1, nave.getVidas(), score,
+                    velXAsteroides + 3, velYAsteroides + 3, cantAsteroides + 10));
+            dispose();
+        }
+    }
+
     private boolean fueraDePantalla(Ball2 ball) {
         return ball.getSprite().getX() < 0 || ball.getSprite().getX() > Gdx.graphics.getWidth()
                 || ball.getSprite().getY() < 0 || ball.getSprite().getY() > Gdx.graphics.getHeight();
@@ -228,7 +218,8 @@ public class PantallaJuego implements Screen {
 
     @Override
     public void dispose() {
-        explosionSound.dispose();
-        gameMusic.dispose();
+        SoundUtils.dispose(explosionSound); // Usar SoundUtils para liberar recursos
+        SoundUtils.dispose(deadSound);
+        SoundUtils.dispose(gameMusic);
     }
 }

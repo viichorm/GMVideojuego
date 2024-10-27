@@ -37,15 +37,15 @@ public class PantallaMenu extends PantallaBase {
 
     @Override
     public void render(float delta) {
-        // Limpiar la pantalla
-        ScreenUtils.clear(0, 0, 0.2f, 1);
+        // Renderizar utilizando el color de fondo compartido en PantallaBase
+        super.render(delta); // Llama a render de PantallaBase para limpiar la pantalla con el color global
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
         // Dibujar el título del menú
-        font.draw(batch, "Space Navigation", 500, 700);
+        font.draw(batch, "Void Odyssey", 500, 700);
 
         // Dibujar las opciones del menú
         for (int i = 0; i < menuOptions.length; i++) {
