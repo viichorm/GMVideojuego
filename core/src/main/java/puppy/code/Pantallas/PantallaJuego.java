@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.audio.Music;
@@ -28,7 +29,8 @@ public class PantallaJuego extends PantallaBase {
     private int velXAsteroides;
     private int velYAsteroides;
     private int cantAsteroides;
-
+    int highScore = cargarHighScore();  // Cargar el HighScore al inicio
+    
     private Nave4 nave;
     private ArrayList<Ball2> balls1 = new ArrayList<>();
     private ArrayList<Ball2> fragmentos = new ArrayList<>();
@@ -39,7 +41,11 @@ public class PantallaJuego extends PantallaBase {
         super(game);  // Llamada al constructor de PantallaBase
 
         this.ronda = ronda;
-        this.score = score;
+    this.score = score;  // Inicializar el puntaje con el valor de entrada
+        if (this.score > highScore) {
+    highScore = this.score;  // Actualizar el HighScore en memoria
+    guardarHighScore(highScore);  // Guardarlo en las preferencias
+}
         this.velXAsteroides = velXAsteroides;
         this.velYAsteroides = velYAsteroides;
         this.cantAsteroides = cantAsteroides;
@@ -48,9 +54,9 @@ public class PantallaJuego extends PantallaBase {
         musicManager = new MusicUtils();
 
         // Cargar sonidos y música con los gestores
-        explosionSound = soundManager.cargar("explosion.ogg");
+        explosionSound = soundManager.cargar("explosion.wav");
         deadSound = soundManager.cargar("dead.wav");
-        gameMusic = musicManager.cargar("piano-loops.wav");
+        gameMusic = musicManager.cargar("piano-loops.mp3");
         gameMusic.setLooping(true);
 
         // Usar el volumen global de PantallaBase
@@ -58,12 +64,14 @@ public class PantallaJuego extends PantallaBase {
         gameMusic.play();
 
         // Crear la nave
-        nave = new Nave4(Gdx.graphics.getWidth() / 2 - 50, 30,
-                         new Texture(Gdx.files.internal("MainShip3.png")),
-                         soundManager.cargar("hurt.ogg"),
-                         new Texture(Gdx.files.internal("Rocket2.png")),
-                         soundManager.cargar("pop-sound.mp3"));
-        nave.setVidas(vidas);
+        // Crear la nave
+nave = new Nave4(Gdx.graphics.getWidth() / 2 - 50, 30,
+                 new Texture(Gdx.files.internal("SpaceShipNormal.png")),  // Textura normal
+                 new Texture(Gdx.files.internal("SpaceshipLowHP.png")),   // Textura crítica
+                 soundManager.cargar("hurt.ogg"),
+                 new Texture(Gdx.files.internal("Rocket2.png")),
+                 soundManager.cargar("pop-sound.mp3"));
+nave.setVidas(vidas);
 
         // Crear asteroides
         Random r = new Random();
@@ -175,17 +183,20 @@ public void render(float delta) {
     }
 
     private void verificarGameOver() {
-        if (nave.estaDestruido()) {
-            soundManager.reproducir(deadSound);
-            nave.desintegrar();
+    if (nave.estaDestruido()) {
+        soundManager.reproducir(deadSound);
+        nave.desintegrar();
 
-            if (score > game.getHighScore()) {
-                game.setHighScore(score);
-            }
-            game.setScreen(new PantallaGameOver(game));
-            dispose();
+        // Verificar y guardar el high score si es superado al final del juego
+        if (score > highScore) {
+            highScore = score;
+            guardarHighScore(highScore);  // Guardar el high score si es necesario
         }
+        
+        game.setScreen(new PantallaGameOver(game));
+        dispose();
     }
+}
 
     private void verificarAvanceNivel() {
         if (balls1.isEmpty()) {
@@ -201,13 +212,30 @@ public void render(float delta) {
                 || ball.getSprite().getY() < 0 || ball.getSprite().getY() > Gdx.graphics.getHeight();
     }
     
+    public void guardarHighScore(int highScore) {
+    Preferences prefs = Gdx.app.getPreferences("MyGamePreferences");  // Nombre del archivo de preferencias
+    prefs.putInteger("highScore", highScore);  // Guardar el valor del HighScore
+    prefs.flush();  // Guardar los cambios
+}
+    public int cargarHighScore() {
+    Preferences prefs = Gdx.app.getPreferences("MyGamePreferences");
+    return prefs.getInteger("highScore", 0);  // Leer el HighScore, si no existe, devuelve 0
+}
+
+
+    
     public void dibujaEncabezado() {
     CharSequence str = "Vidas: " + nave.getVidas() + " Ronda: " + ronda;
     game.getFont().getData().setScale(2f);
-    game.getFont().draw(batch, str, 10, 30);
-    game.getFont().draw(batch, "Score:" + this.score, Gdx.graphics.getWidth() - 150, 30);
-    game.getFont().draw(batch, "HighScore:" + game.getHighScore(), Gdx.graphics.getWidth() / 2 - 100, 30);
+
+    float alturaPantalla = Gdx.graphics.getHeight();
+    float posicionY = alturaPantalla - 10;
+
+    game.getFont().draw(batch, str, 10, 30);  // Vidas y ronda a la izquierda
+    game.getFont().draw(batch, "Score:" + this.score, Gdx.graphics.getWidth() - 150, 30);  // Score a la derecha
+    game.getFont().draw(batch, "HighScore:" + highScore, Gdx.graphics.getWidth() / 2 - 100, 30);  // HighScore al centro
 }
+
 
 
     public boolean agregarBala(Bullet bb) {
