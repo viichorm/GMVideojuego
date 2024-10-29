@@ -3,6 +3,7 @@ package puppy.code.Pantallas;
 import java.util.ArrayList;
 import java.util.Random;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.audio.Music;
@@ -86,25 +87,31 @@ public class PantallaJuego extends PantallaBase {
     }
 
     @Override
-    public void render(float delta) {
-        // Usar el color de fondo de PantallaBase
-        super.render(delta);
-
-        batch.begin();
-        dibujaEncabezado();
-
-        if (!nave.estaHerido()) {
-            actualizarBalas();
-            actualizarAsteroidesYFragmentos();
-            verificarColisionesNave();
-        }
-
-        nave.draw(batch, this);
-        batch.end();
-
-        verificarGameOver();
-        verificarAvanceNivel();
+public void render(float delta) {
+    super.render(delta); // Renderiza el fondo de PantallaBase
+    
+    // Detecta la tecla ESC para pausar el juego
+    if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        gameMusic.pause();
+        game.setScreen(new PantallaPausa(game, this)); // Cambia a la pantalla de pausa
+        return;
     }
+    
+    batch.begin();
+    dibujaEncabezado();
+
+    if (!nave.estaHerido()) {
+        actualizarBalas();
+        actualizarAsteroidesYFragmentos();
+        verificarColisionesNave();
+    }
+
+    nave.draw(batch, this);
+    batch.end();
+
+    verificarGameOver();
+    verificarAvanceNivel();
+}
 
     private void actualizarBalas() {
         for (int i = 0; i < balas.size(); i++) {
