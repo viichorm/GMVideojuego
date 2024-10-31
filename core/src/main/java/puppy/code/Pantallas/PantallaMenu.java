@@ -22,7 +22,7 @@ public class PantallaMenu extends PantallaBase {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1200, 800);
 
-        menuMusic = Gdx.audio.newMusic(Gdx.files.internal("menu-song.wav"));
+        menuMusic = Gdx.audio.newMusic(Gdx.files.internal("menu-song.mp3"));
         menuMusic.setLooping(true);
         menuMusic.setVolume(getVolumenGlobal());  // Aplicar el volumen global
 
