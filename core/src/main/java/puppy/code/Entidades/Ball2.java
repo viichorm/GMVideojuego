@@ -9,7 +9,6 @@ import puppy.code.Componentes.EntidadMovil;
 import puppy.code.Pantallas.PantallaJuego;
 
 public class Ball2 extends EntidadMovil {
-
     private PantallaJuego pantallaJuego;
     private static final Random random = new Random();
     private boolean isExplosive;
@@ -38,20 +37,14 @@ public class Ball2 extends EntidadMovil {
         spr.setPosition(spr.getX() + xSpeed, spr.getY() + ySpeed);
 
         // Rebote en los bordes de la pantalla
-        if (spr.getX() < 0) {
-            spr.setX(0); // Asegura que no se salga del borde izquierdo
-            xSpeed = -xSpeed; // Cambia la dirección horizontal
-        } else if (spr.getX() + spr.getWidth() > Gdx.graphics.getWidth()) {
-            spr.setX(Gdx.graphics.getWidth() - spr.getWidth()); // Asegura que no se salga del borde derecho
-            xSpeed = -xSpeed; // Cambia la dirección horizontal
+        if (spr.getX() < 0 || spr.getX() + spr.getWidth() > Gdx.graphics.getWidth()) {
+            xSpeed = -xSpeed;
+            spr.setX(Math.max(0, Math.min(spr.getX(), Gdx.graphics.getWidth() - spr.getWidth())));
         }
 
-        if (spr.getY() < 0) {
-            spr.setY(0); // Asegura que no se salga del borde inferior
-            ySpeed = -ySpeed; // Cambia la dirección vertical
-        } else if (spr.getY() + spr.getHeight() > Gdx.graphics.getHeight()) {
-            spr.setY(Gdx.graphics.getHeight() - spr.getHeight()); // Asegura que no se salga del borde superior
-            ySpeed = -ySpeed; // Cambia la dirección vertical
+        if (spr.getY() < 0 || spr.getY() + spr.getHeight() > Gdx.graphics.getHeight()) {
+            ySpeed = -ySpeed;
+            spr.setY(Math.max(0, Math.min(spr.getY(), Gdx.graphics.getHeight() - spr.getHeight())));
         }
     }
 
@@ -61,22 +54,20 @@ public class Ball2 extends EntidadMovil {
     }
 
     @Override
-    public boolean checkCollision(EntidadMovil other) {
-        if (spr.getBoundingRectangle().overlaps(other.getArea())) {
-            if (isExplosive && fragmentCount > 0) {
-                explode(); // Evita que fragmentos exploten de nuevo
-            }
-            xSpeed = -xSpeed;
-            ySpeed = -ySpeed;
-            return true;
+    protected void handleCollision(EntidadMovil other) {
+        // Rebotar y gestionar la explosión
+        xSpeed = -xSpeed;
+        ySpeed = -ySpeed;
+
+        if (isExplosive && fragmentCount > 0) {
+            explode();
         }
-        return false;
     }
 
     public void explode() {
-        if (!isExplosive || fragmentCount == 0) return; // No explota si es fragmento o ya explotó
+        if (!isExplosive || fragmentCount == 0) return;
 
-        // Generar los fragmentos en direcciones aleatorias
+        // Generar fragmentos en direcciones aleatorias
         for (int i = 0; i < fragmentCount; i++) {
             int fragmentXSpeed = random.nextInt(4) - 2;
             int fragmentYSpeed = random.nextInt(4) - 2;
@@ -88,7 +79,7 @@ public class Ball2 extends EntidadMovil {
             );
             pantallaJuego.agregarFragmento(fragment);
         }
-        isExplosive = false; // Evita que el asteroide explote de nuevo
+        isExplosive = false; // Evitar futuras explosiones
     }
 
     // Método getter para isExplosive
@@ -98,13 +89,5 @@ public class Ball2 extends EntidadMovil {
 
     public Sprite getSprite() {
         return this.spr;
-    }
-
-    int getySpeed() {
-        return this.ySpeed;
-    }
-
-    void setySpeed(int i) {
-        this.ySpeed = i;
     }
 }

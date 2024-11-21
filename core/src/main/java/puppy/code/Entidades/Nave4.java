@@ -171,17 +171,15 @@ private boolean visible = true;     // Si la nave es visible o no
             xVel = -xVel;
             b.setXSpeed(-b.getXSpeed());
 
-            if (yVel == 0) yVel += b.getySpeed() / 2;
-            if (b.getySpeed() == 0) b.setySpeed(b.getySpeed() + (int) yVel / 2);
+            if (yVel == 0) yVel += b.getYSpeed() / 2; // Cambiado a getYSpeed()
+            if (b.getYSpeed() == 0) b.setYSpeed(b.getYSpeed() + (int) yVel / 2); // Cambiado a getYSpeed() y setYSpeed()
             yVel = -yVel;
-            b.setySpeed(-b.getySpeed());
+            b.setYSpeed(-b.getYSpeed()); // Cambiado a setYSpeed()
 
-            // Actualizar vidas y herir
             herido = true;
             tiempoHerido = tiempoHeridoMax;
             sonidoHerido.play();
-            if (vidas <= 0)
-                destruida = true;
+            if (vidas <= 0) destruida = true;
             return true;
         }
         return false;
