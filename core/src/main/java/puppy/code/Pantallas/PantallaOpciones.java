@@ -1,6 +1,5 @@
 package puppy.code.Pantallas;
 
-import puppy.code.Componentes.PantallaBase;
 import puppy.code.Utils.SoundUtils;
 import puppy.code.Utils.MusicUtils;  // Importar la clase MusicUtils
 import com.badlogic.gdx.Gdx;

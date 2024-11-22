@@ -1,4 +1,4 @@
-package puppy.code.Componentes;
+package puppy.code.Pantallas;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;

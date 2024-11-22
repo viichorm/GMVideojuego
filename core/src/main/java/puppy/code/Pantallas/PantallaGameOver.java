@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
-import puppy.code.Componentes.PantallaBase;
 import puppy.code.Utils.SoundUtils;
 import puppy.code.Utils.MusicUtils;
 

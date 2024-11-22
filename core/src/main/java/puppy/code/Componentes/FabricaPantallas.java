@@ -1,5 +1,6 @@
 package puppy.code.Componentes;
 
+import puppy.code.Pantallas.PantallaBase;
 import puppy.code.Pantallas.PantallaJuego;
 import puppy.code.Pantallas.SpaceNavigation;
 
