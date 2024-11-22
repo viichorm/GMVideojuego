@@ -297,7 +297,7 @@ private boolean visible = true;     // Si la nave es visible o no
     tiempoHerido = tiempoHeridoMax;
 
     // Cambiar a la textura de vida crítica si la vida es 1
-    if (vidas == 1) {
+    if (vidas == 0) {
         spr.setTexture(textureCritico);  // Cambiar la textura
     }
     }

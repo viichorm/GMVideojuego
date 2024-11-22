@@ -83,7 +83,7 @@ public class PantallaOpciones extends PantallaBase {
                     ajustarVolumen();  // Ajustar el volumen cuando se selecciona la opción
                     break;
                 case 2:
-                    game.setScreen(new PantallaMenu(game));
+                    game.cambiarAPantallaMenu();
                     dispose();
                     break;
             }

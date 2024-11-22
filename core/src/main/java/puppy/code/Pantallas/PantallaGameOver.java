@@ -11,7 +11,7 @@ import puppy.code.Utils.MusicUtils;
 public class PantallaGameOver extends PantallaBase {
     private Music gameOverSound;
     private MusicUtils gestorMusica;  // Instancia de MusicManager    private GestorRecursos<Music> gestorSonido;
-    
+    	
     private float elapsedTime;
     private float restartCounter;  // Contador de tiempo hasta que se permita reiniciar
     private boolean showText;
@@ -38,40 +38,40 @@ public class PantallaGameOver extends PantallaBase {
     }
 
     @Override
-public void render(float delta) {
-    super.render(delta);  // Renderiza el fondo de PantallaBase
-
-    // Actualizar el tiempo transcurrido para el parpadeo del texto
-    elapsedTime += delta;
-    if (elapsedTime >= 0.5f) {
-        showText = !showText;
-        elapsedTime = 0;
+    public void render(float delta) {
+	    super.render(delta);  // Renderiza el fondo de PantallaBase
+	
+	    // Actualizar el tiempo transcurrido para el parpadeo del texto
+	    elapsedTime += delta;
+	    if (elapsedTime >= 0.5f) {
+	        showText = !showText;
+	        elapsedTime = 0;
+	    }
+	
+	    // Inicia el contador de reinicio tras el freezeTime
+	    if (!canRestart && restartCounter < freezeTime) {
+	        restartCounter += delta;
+	    } else {
+	        canRestart = true;  // Permitir reiniciar después del freezeTime
+	    }
+	
+	    game.getBatch().begin();
+	    // Mostrar "Game Over !!!" con parpadeo
+	    if (showText) {
+	        game.getFont().draw(game.getBatch(), "GAME OVER", 120, 400, 400, 1, true);
+	    }
+	    // Mostrar el mensaje de reinicio y el tiempo restante
+	    if (!canRestart) {
+	        int segundosRestantes = (int) (freezeTime - restartCounter + 1);
+	        game.getFont().draw(game.getBatch(), "Podrás reiniciar en " + segundosRestantes + " segundos", 100, 300);
+	    } else {
+	        game.getFont().draw(game.getBatch(), "Presiona cualquier tecla para reiniciar ...", 100, 300);
+	    }
+	    game.getBatch().end();
+	
+	    // Llamar a manejarInput para controlar la entrada del usuario
+	    manejarInput();
     }
-
-    // Inicia el contador de reinicio tras el freezeTime
-    if (!canRestart && restartCounter < freezeTime) {
-        restartCounter += delta;
-    } else {
-        canRestart = true;  // Permitir reiniciar después del freezeTime
-    }
-
-    game.getBatch().begin();
-    // Mostrar "Game Over !!!" con parpadeo
-    if (showText) {
-        game.getFont().draw(game.getBatch(), "GAME OVER", 120, 400, 400, 1, true);
-    }
-    // Mostrar el mensaje de reinicio y el tiempo restante
-    if (!canRestart) {
-        int segundosRestantes = (int) (freezeTime - restartCounter + 1);
-        game.getFont().draw(game.getBatch(), "Podrás reiniciar en " + segundosRestantes + " segundos", 100, 300);
-    } else {
-        game.getFont().draw(game.getBatch(), "Presiona cualquier tecla para reiniciar ...", 100, 300);
-    }
-    game.getBatch().end();
-
-    // Llamar a manejarInput para controlar la entrada del usuario
-    manejarInput();
-}
 
     @Override
     public void dispose() {
@@ -83,16 +83,14 @@ public void render(float delta) {
     }
 
     @Override
-protected void manejarInput() {
+    protected void manejarInput() {
     // Verificar si se permite reiniciar el juego y si el usuario interactúa
-    if (canRestart && (Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY))) {
-        // Crear una nueva instancia de PantallaJuego para reiniciar el juego
-        Screen nuevaPantallaJuego = new PantallaJuego(game, 1, 3, 0, 1, 1, 10);
-        nuevaPantallaJuego.resize(1200, 800);
-        game.setScreen(nuevaPantallaJuego);
-        dispose();
+	    if (canRestart && (Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY))) {
+	    	// Cambiar pantalla usando SpaceNavigation
+	        game.cambiarAPantallaJuego(1, 3, 0, 1, 1, 10);
+	        dispose();
+	    }
     }
-}
 
     @Override
     public void show() {

@@ -94,7 +94,9 @@ public class PantallaPausa extends PantallaBase {
             switch (opcionSeleccionada) {
                 case 0: // Reanudar
                     musicManager.detener(musicaPausa);
-                    game.setScreen(pantallaJuego);
+                    // Aquí no necesitas crear una nueva instancia de PantallaJuego,
+                    // solo reanudas la instancia existente de PantallaJuego
+                    game.setScreen(pantallaJuego); // Reutiliza la pantalla que ya existe
                     break;
                 case 1: // Salir
                     Gdx.app.exit(); // Salir del juego
