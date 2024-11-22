@@ -1,22 +1,22 @@
 package puppy.code.Pantallas;
 
 import puppy.code.Componentes.PantallaBase;
-import puppy.code.utils.SoundUtils;
-import puppy.code.utils.MusicUtils;  // Importar la clase MusicUtils
+import puppy.code.Utils.SoundUtils;
+import puppy.code.Utils.MusicUtils;  // Importar la clase MusicUtils
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.ScreenUtils;
-import puppy.code.Componentes.GestorRecursos;
+
 
 public class PantallaOpciones extends PantallaBase {
     // Opciones del menú, incluyendo la nueva opción de volumen
     private String[] opciones = {"Color Fondo: Azul", "Volumen: 50%", "Volver"};
     private float volumen = 0.5f;  // Volumen inicial al 50%
     
-    private GestorRecursos<Sound> soundGestor;
-    private GestorRecursos<Music> musicGestor;  // Cambiar a GestorRecursos<Music> para manejar música
+    private SoundUtils soundGestor;
+    private MusicUtils musicGestor;  // Cambiar a GestorRecursos<Music> para manejar música
     
     private int selectedIndex = 0;
     private float[] fondoColor = {0, 0, 0.2f};
@@ -27,8 +27,8 @@ public class PantallaOpciones extends PantallaBase {
 
     public PantallaOpciones(SpaceNavigation game) {
         super(game);
-        soundGestor = new SoundUtils();
-        musicGestor = new MusicUtils();
+        soundGestor = SoundUtils.getInstancia();
+        musicGestor = MusicUtils.getInstancia();
 
         optionMoveSound = soundGestor.cargar("opcion-menu.wav");
         backgroundMusic = musicGestor.cargar("ObservingTheStar.ogg");
@@ -83,7 +83,7 @@ public class PantallaOpciones extends PantallaBase {
                     ajustarVolumen();  // Ajustar el volumen cuando se selecciona la opción
                     break;
                 case 2:
-                    game.setScreen(new PantallaMenu(game));
+                    game.cambiarAPantallaMenu();
                     dispose();
                     break;
             }

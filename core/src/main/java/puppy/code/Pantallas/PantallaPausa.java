@@ -5,15 +5,15 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import puppy.code.Componentes.PantallaBase;
-import puppy.code.utils.SoundUtils;
-import puppy.code.utils.MusicUtils;
+import puppy.code.Utils.SoundUtils;
+import puppy.code.Utils.MusicUtils;
 
 public class PantallaPausa extends PantallaBase {
 
     private float elapsedTime;
     private boolean showText;
     private PantallaJuego pantallaJuego;
-
+    
     private SoundUtils soundManager;
     private MusicUtils musicManager;
     private Sound sonidoPausa;
@@ -31,8 +31,8 @@ public class PantallaPausa extends PantallaBase {
         this.showText = true;
 
         // Inicialización de los gestores de recursos
-        soundManager = new SoundUtils();
-        musicManager = new MusicUtils();
+        soundManager = SoundUtils.getInstancia();
+        musicManager = MusicUtils.getInstancia();
 
         // Cargar el sonido y la música para la pausa
         sonidoPausa = soundManager.cargar("SonidoPausa.wav");
@@ -94,7 +94,9 @@ public class PantallaPausa extends PantallaBase {
             switch (opcionSeleccionada) {
                 case 0: // Reanudar
                     musicManager.detener(musicaPausa);
-                    game.setScreen(pantallaJuego);
+                    // Aquí no necesitas crear una nueva instancia de PantallaJuego,
+                    // solo reanudas la instancia existente de PantallaJuego
+                    game.setScreen(pantallaJuego); // Reutiliza la pantalla que ya existe
                     break;
                 case 1: // Salir
                     Gdx.app.exit(); // Salir del juego

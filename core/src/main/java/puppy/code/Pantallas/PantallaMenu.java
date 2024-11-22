@@ -75,11 +75,11 @@ public class PantallaMenu extends PantallaBase {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             switch (selectedIndex) {
                 case 0:
-                    game.setScreen(new PantallaJuego(game, 1, 3, 0, 1, 1, 10));
+                    game.cambiarAPantallaJuego(1, 3, 0, 1, 1, 10);
                     dispose();
                     break;
                 case 1:
-                    game.setScreen(new PantallaOpciones(game));
+                    game.cambiarAPantallaOpciones();
                     dispose();
                     break;
                 case 2:

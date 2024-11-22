@@ -57,12 +57,9 @@ public abstract class PantallaBase implements Screen {
     }
     
     @Override
-public void resize(int width, int height) {
-    camera.setToOrtho(false, width, height);
-}
-
-    
-    
+    public void resize(int width, int height) {
+    	camera.setToOrtho(false, width, height);
+    }
 
     @Override
     public void dispose() {

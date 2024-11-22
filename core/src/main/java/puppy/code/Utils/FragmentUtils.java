@@ -1,4 +1,4 @@
-package puppy.code.utils;
+package puppy.code.Utils;
 
 import java.util.Random;
 import com.badlogic.gdx.graphics.Texture;

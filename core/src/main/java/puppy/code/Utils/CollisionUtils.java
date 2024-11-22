@@ -1,4 +1,4 @@
-package puppy.code.utils;
+package puppy.code.Utils;
 
 import puppy.code.Entidades.Ball2;
 import puppy.code.Entidades.Bullet;
