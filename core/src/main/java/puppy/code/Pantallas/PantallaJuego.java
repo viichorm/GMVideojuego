@@ -66,11 +66,12 @@ public class PantallaJuego extends PantallaBase {
     gameMusic.play();
 
     // Inicializar la estrategia de disparo según la ronda
-    if (ronda >= 2) {
-        estrategiaDisparo = new DisparoMultiple();  // Disparo múltiple a partir de la ronda 3
-    } else {
-        estrategiaDisparo = new DisparoUnico();  // Disparo único para las primeras 2 rondas
-    }
+    if (ronda >= 3) {
+    estrategiaDisparo = new DisparoMultiple();  // Disparo múltiple para rondas altas
+} else {
+    estrategiaDisparo = new DisparoUnico();  // Disparo único para rondas bajas
+}
+
 
     // Crear la nave
     nave = new Nave4(Gdx.graphics.getWidth() / 2 - 50, 30,
@@ -136,6 +137,7 @@ public class PantallaJuego extends PantallaBase {
         b.update();
         b.draw(batch);
 
+        // Verifica colisiones de balas con asteroides
         for (int j = 0; j < balls1.size(); j++) {
             if (b.checkCollision(balls1.get(j))) {
                 soundManager.reproducir(explosionSound);
@@ -146,6 +148,7 @@ public class PantallaJuego extends PantallaBase {
             }
         }
 
+        // Si la bala está destruida, elimínala
         if (b.estaDestruido()) {
             balas.remove(i);
             i--;
@@ -253,12 +256,16 @@ public class PantallaJuego extends PantallaBase {
     }
 
     @Override
-    protected void manejarInput() {
-        if  (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            // Utiliza la estrategia de disparo correspondiente
-            estrategiaDisparo.shoot(nave, balas);
-        }
+protected void manejarInput() {
+    if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        estrategiaDisparo.shoot(nave, balas);  // Realiza el disparo usando la estrategia
+        reproducirSonidoDisparo();            // Reproduce el sonido de disparo
     }
+}
+
+private void reproducirSonidoDisparo() {
+    soundManager.reproducir(nave.getSoundBala()); // Usa el sonido de la bala asignado en la nave
+}
 
     @Override
     public void dispose() {

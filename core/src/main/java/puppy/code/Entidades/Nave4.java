@@ -153,12 +153,7 @@ private boolean visible = true;     // Si la nave es visible o no
             if (tiempoHerido <= 0) herido = false;  // Dejar de estar herida
         }
 
-        // Control de disparo
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            Bullet bala = new Bullet(spr.getX() + spr.getWidth() / 2 - 5, spr.getY() + spr.getHeight() - 5, 0, 3, txBala);
-            juego.agregarBala(bala);
-            soundBala.play();
-        }
+        
     }
 }
 
@@ -184,7 +179,8 @@ private boolean visible = true;     // Si la nave es visible o no
         }
         return false;
     }
-
+    
+    
     
     
     public boolean isDestruida() {
